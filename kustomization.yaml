@@ -1,0 +1,49 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: agent-office
+
+# Each module's `.md` file becomes a ConfigMap whose key matches the
+# canonical filename the OpenClaw runtime expects in /workspace/workspace.
+# That filename is the AAIF-aligned name (AGENTS.md, etc.), preserved across
+# any AAIF-compliant tool (Claude Code, Codex CLI, Cursor, GitHub Copilot,
+# Gemini CLI, Goose, Devin).
+#
+# The MemoryModule CRs that REFERENCE these ConfigMaps land in slice B; for
+# slice A the goal is just: edit a `.md` file in this repo, see the
+# corresponding `mm-<kind>-<name>` ConfigMap update in the cluster.
+configMapGenerator:
+  # AGENTS.md content modules — the universal cross-tool agent-instructions
+  # file (AAIF / Linux Foundation standard, December 2025). Each module
+  # produces a different "personality / role" version of AGENTS.md that
+  # agents can reference.
+  - name: mm-agents-concierge
+    files:
+      - AGENTS.md=modules/agents/concierge.md
+
+  # USER.md — user profile / preferences. Currently identical across all 5
+  # cluster agents, perfect candidate to deduplicate first.
+  - name: mm-user-default-context
+    files:
+      - USER.md=modules/user/default-context.md
+
+  # SKILL — Anthropic's Skills Open Standard (also under AAIF). The OpenClaw
+  # init container unpacks SKILL_<name>.md into skills/<name>/SKILL.md at
+  # workspace render time.
+  - name: mm-skill-claude-code
+    files:
+      - SKILL_claude-code.md=modules/skill/claude-code.md
+
+  # TOOLS.md — common tool-allowlist content. The 118-byte form shared
+  # across devhub-scaffolder, taskmaster, web-browser-researcher.
+  - name: mm-tools-standard-set
+    files:
+      - TOOLS.md=modules/tools/standard-set.md
+
+# Disable the default name suffix (kustomize would otherwise hash-suffix the
+# CM names, which breaks stable cross-references from MemoryModule CRs in
+# slice B).
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    app.kubernetes.io/managed-by: agent-office-memory-modules
+    app.kubernetes.io/part-of: agent-office
