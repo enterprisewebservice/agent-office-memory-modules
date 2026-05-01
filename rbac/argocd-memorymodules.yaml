@@ -1,0 +1,35 @@
+---
+# Lets the OpenShift GitOps application-controller manage MemoryModule CRs.
+# Without this, ArgoCD can install the CRD itself but fails to apply the CRs
+# with: "memorymodules.agentoffice.ai ... is forbidden".
+#
+# Scope: cluster-wide (the CRs are namespaced, but the app-controller SA is
+# cluster-singleton). The ClusterRoleBinding is the standard pattern Red Hat
+# documents for extending OpenShift GitOps with custom CRDs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argocd-memorymodules-manager
+  labels:
+    app.kubernetes.io/managed-by: agent-office-memory-modules
+    app.kubernetes.io/part-of: agent-office
+rules:
+  - apiGroups: ["agentoffice.ai"]
+    resources: ["memorymodules", "memorymodules/status"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argocd-memorymodules-manager
+  labels:
+    app.kubernetes.io/managed-by: agent-office-memory-modules
+    app.kubernetes.io/part-of: agent-office
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: argocd-memorymodules-manager
+subjects:
+  - kind: ServiceAccount
+    name: openshift-gitops-argocd-application-controller
+    namespace: openshift-gitops

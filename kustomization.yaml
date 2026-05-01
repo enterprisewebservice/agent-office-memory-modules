@@ -13,6 +13,11 @@ resources:
   # CRD — installed cluster-wide. ArgoCD's ServerSideApply respects existing
   # field ownership so re-applying is safe.
   - crd/memorymodule-crd.yaml
+  # RBAC — grants the OpenShift GitOps application-controller SA permission
+  # to manage MemoryModule CRs. Without this, ArgoCD installs the CRD then
+  # fails to apply the CRs with a forbidden error. Ships with the CRD so
+  # the library is self-contained.
+  - rbac/argocd-memorymodules.yaml
   # One CR per shared module. The status subresource (referencedBy,
   # contentSha256) is populated by the slice-D controller.
   - modules/agents/concierge.module.yaml
