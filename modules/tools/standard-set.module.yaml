@@ -1,0 +1,17 @@
+apiVersion: agentoffice.ai/v1alpha1
+kind: MemoryModule
+metadata:
+  name: tools-standard-set
+  namespace: agent-office
+  labels:
+    agentoffice.ai/kind: tools
+    app.kubernetes.io/managed-by: agent-office-memory-modules
+spec:
+  kind: tools
+  filename: TOOLS.md
+  version: "1.0.0"
+  description: "Common tool-allowlist content shared across devhub-scaffolder, taskmaster, and web-browser-researcher. Lists the standard set of tools an agent may invoke."
+  source:
+    configMapRef:
+      name: mm-tools-standard-set
+      key: TOOLS.md

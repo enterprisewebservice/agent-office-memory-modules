@@ -1,0 +1,17 @@
+apiVersion: agentoffice.ai/v1alpha1
+kind: MemoryModule
+metadata:
+  name: agents-concierge
+  namespace: agent-office
+  labels:
+    agentoffice.ai/kind: agents
+    app.kubernetes.io/managed-by: agent-office-memory-modules
+spec:
+  kind: agents
+  filename: AGENTS.md
+  version: "1.0.0"
+  description: "Concierge agent role — onboarding flow, pointers to RHDH and the browser-nodehost skill. Suitable for the default 'help me create an agent' persona."
+  source:
+    configMapRef:
+      name: mm-agents-concierge
+      key: AGENTS.md

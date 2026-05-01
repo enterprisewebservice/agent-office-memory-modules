@@ -1,0 +1,17 @@
+apiVersion: agentoffice.ai/v1alpha1
+kind: MemoryModule
+metadata:
+  name: user-default-context
+  namespace: agent-office
+  labels:
+    agentoffice.ai/kind: user
+    app.kubernetes.io/managed-by: agent-office-memory-modules
+spec:
+  kind: user
+  filename: USER.md
+  version: "1.0.0"
+  description: "Default user context — short, neutral, suitable as a starting USER.md for any agent. Currently identical to the inline USER.md across every cluster agent."
+  source:
+    configMapRef:
+      name: mm-user-default-context
+      key: USER.md

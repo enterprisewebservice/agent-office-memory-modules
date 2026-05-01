@@ -1,0 +1,32 @@
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: deanpeterson
+  namespace: default
+spec:
+  profile:
+    displayName: Dean Peterson
+    email: deanpeterson@redhat.com
+  memberOf: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: agent-office-memory-modules
+  title: Agent Office Memory Modules
+  description: Library of shared MemoryModule content for agents in the Governed Agent Platform — single source of truth for AGENTS.md, USER.md, SKILL_*.md, TOOLS.md content.
+  links:
+    - url: "https://devspaces.apps.salamander.aimlworkbench.com/#https://github.com/enterprisewebservice/agent-office-memory-modules"
+      title: "Open Library in Dev Spaces"
+      icon: catalog
+      type: devspaces
+  tags:
+    - ai
+    - agent
+    - memory
+    - aaif
+    - openshift
+spec:
+  type: library
+  lifecycle: production
+  owner: user:default/deanpeterson

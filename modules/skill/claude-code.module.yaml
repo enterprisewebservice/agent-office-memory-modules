@@ -1,0 +1,17 @@
+apiVersion: agentoffice.ai/v1alpha1
+kind: MemoryModule
+metadata:
+  name: skill-claude-code
+  namespace: agent-office
+  labels:
+    agentoffice.ai/kind: skill
+    app.kubernetes.io/managed-by: agent-office-memory-modules
+spec:
+  kind: skill
+  filename: SKILL_claude-code.md
+  version: "1.0.0"
+  description: "Skill describing how to use Claude Code as the reasoning engine. Currently shared across devhub-scaffolder, permission-probe, and taskmaster."
+  source:
+    configMapRef:
+      name: mm-skill-claude-code
+      key: SKILL_claude-code.md

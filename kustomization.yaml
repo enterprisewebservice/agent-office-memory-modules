@@ -2,15 +2,29 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: agent-office
 
+# Slice B (current): the MemoryModule CRD plus one CR per module. Each CR
+# references the ConfigMap produced by the configMapGenerator below, so a
+# single `kustomize build` produces both the content (CMs) and the catalog
+# (CRs) — atomic, GitOps-friendly, declarative-and-reversible.
+#
+# Slice D will add a controller that watches MemoryModule + AgentWorkstation
+# and renders the per-agent ConfigMaps. Slice E surfaces these in the UI.
+resources:
+  # CRD — installed cluster-wide. ArgoCD's ServerSideApply respects existing
+  # field ownership so re-applying is safe.
+  - crd/memorymodule-crd.yaml
+  # One CR per shared module. The status subresource (referencedBy,
+  # contentSha256) is populated by the slice-D controller.
+  - modules/agents/concierge.module.yaml
+  - modules/user/default-context.module.yaml
+  - modules/skill/claude-code.module.yaml
+  - modules/tools/standard-set.module.yaml
+
 # Each module's `.md` file becomes a ConfigMap whose key matches the
 # canonical filename the OpenClaw runtime expects in /workspace/workspace.
 # That filename is the AAIF-aligned name (AGENTS.md, etc.), preserved across
 # any AAIF-compliant tool (Claude Code, Codex CLI, Cursor, GitHub Copilot,
 # Gemini CLI, Goose, Devin).
-#
-# The MemoryModule CRs that REFERENCE these ConfigMaps land in slice B; for
-# slice A the goal is just: edit a `.md` file in this repo, see the
-# corresponding `mm-<kind>-<name>` ConfigMap update in the cluster.
 configMapGenerator:
   # AGENTS.md content modules — the universal cross-tool agent-instructions
   # file (AAIF / Linux Foundation standard, December 2025). Each module
