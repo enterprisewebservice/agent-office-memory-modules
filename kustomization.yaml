@@ -2,24 +2,18 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: agent-office
 
-# Slice B (current): the MemoryModule CRD plus one CR per module. Each CR
-# references the ConfigMap produced by the configMapGenerator below, so a
-# single `kustomize build` produces both the content (CMs) and the catalog
-# (CRs) — atomic, GitOps-friendly, declarative-and-reversible.
+# Library content tier:
+#   - configMapGenerator below: ConfigMaps holding the .md content
+#   - resources: one MemoryModule CR per .md (references the CM by name)
 #
-# Slice D will add a controller that watches MemoryModule + AgentWorkstation
-# and renders the per-agent ConfigMaps. Slice E surfaces these in the UI.
+# The MemoryModule CRD itself is owned by agent-office-operator (slice 2)
+# and installed via OLM, so it's not in this repo anymore. The ArgoCD
+# application-controller still needs CRUD on memorymodules.agentoffice.ai
+# to apply the CRs below — that grant ships in rbac/.
 resources:
-  # CRD — installed cluster-wide. ArgoCD's ServerSideApply respects existing
-  # field ownership so re-applying is safe.
-  - crd/memorymodule-crd.yaml
-  # RBAC — grants the OpenShift GitOps application-controller SA permission
-  # to manage MemoryModule CRs. Without this, ArgoCD installs the CRD then
-  # fails to apply the CRs with a forbidden error. Ships with the CRD so
-  # the library is self-contained.
   - rbac/argocd-memorymodules.yaml
-  # One CR per shared module. The status subresource (referencedBy,
-  # contentSha256) is populated by the slice-D controller.
+  # One CR per shared module. status.contentSha256 + status.referencedBy
+  # are populated by agent-office-operator's MemoryModule controller.
   - modules/agents/concierge.module.yaml
   - modules/user/default-context.module.yaml
   - modules/skill/claude-code.module.yaml
