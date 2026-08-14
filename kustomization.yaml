@@ -18,6 +18,10 @@ resources:
   - modules/user/default-context.module.yaml
   - modules/skill/claude-code.module.yaml
   - modules/tools/standard-set.module.yaml
+  # custom — team operating handbooks (free-form filename under the AAIF
+  # 'custom' kind). The supply-chain handbook is the institutional memory
+  # the demo's new hires inherit.
+  - modules/custom/supply-chain-handbook.module.yaml
 
 # Each module's `.md` file becomes a ConfigMap whose key matches the
 # canonical filename the OpenClaw runtime expects in /workspace/workspace.
@@ -51,6 +55,12 @@ configMapGenerator:
   - name: mm-tools-standard-set
     files:
       - TOOLS.md=modules/tools/standard-set.md
+
+  # Team operating handbooks — the scar-tissue tier: report norms,
+  # orders-api quirks, escalation rules for supply-chain agents.
+  - name: mm-supply-chain-handbook
+    files:
+      - HANDBOOK_supply-chain-ops.md=modules/custom/supply-chain-handbook.md
 
 # Disable the default name suffix (kustomize would otherwise hash-suffix the
 # CM names, which breaks stable cross-references from MemoryModule CRs in
