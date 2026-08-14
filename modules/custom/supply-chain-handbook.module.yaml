@@ -1,0 +1,17 @@
+apiVersion: agentoffice.ai/v1alpha1
+kind: MemoryModule
+metadata:
+  name: supply-chain-handbook
+  namespace: agent-office
+  labels:
+    agentoffice.ai/kind: custom
+    app.kubernetes.io/managed-by: agent-office-memory-modules
+spec:
+  kind: custom
+  filename: HANDBOOK_supply-chain-ops.md
+  version: "1.0.0"
+  description: "Supply-chain team operating memory — report norms, orders-api quirks, escalation rules. The scar tissue new hires should not relearn."
+  source:
+    configMapRef:
+      name: mm-supply-chain-handbook
+      key: HANDBOOK_supply-chain-ops.md
